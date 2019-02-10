@@ -2203,4 +2203,40 @@ update_pull_request() {
         | _filter_json "$_filter"
 }
 
+list_projects() {
+    # List branches of a specified repository.
+    # ( https://developer.github.com/v3/repos/#projects )
+    #
+    # Usage:
+    #
+    #     list_projects user repo
+    #
+    # Positional arguments
+    #
+    #   GitHub user login or id for which to list projects
+    #   Name of the repo for which to list projects
+    #
+    local user="${1:?User name required.}"
+    local repo="${2:?Repo name required.}"
+    shift 2
+    #
+    # Keyword arguments
+    #
+    local _filter='.[] | "\(.name)"'
+    #   A jq filter to apply to the return data.
+    #
+    # Querystring arguments may also be passed as keyword arguments:
+    #
+    # * `state`
+
+    local qs
+
+    _opts_filter "$@"
+    _opts_qs "$@"
+
+    url="/repos/${user}/${repo}/projects"
+
+    _get "${url}${qs}" | _filter_json "${_filter}"
+}
+
 __main "$@"
